@@ -1,3 +1,6 @@
 streamlit
-crewai[google-genai]
+google-genai
 duckduckgo-search
+reportlab
+arxiv
+pydantic
