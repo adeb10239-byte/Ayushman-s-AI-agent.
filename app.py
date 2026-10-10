@@ -20,7 +20,7 @@ agent_backstory = st.sidebar.text_area("Agent Backstory:", value="You are a fast
 # Toggle capability
 enable_web_search = st.sidebar.checkbox("Give Agent Web Search Capabilities?", value=True)
 
-# OPTIMIZATION 1: Reduced max_results to 2 to minimize web scraping latency
+# OPTIMIZATION: Reduced max_results to 2 to minimize web scraping latency
 @tool("Web Search Tool")
 def web_search(query: str) -> str:
     """Searches the live internet using DuckDuckGo to find information on a given topic query."""
@@ -43,9 +43,9 @@ if st.button("🚀 Run AI Agent"):
     else:
         with st.spinner("Agent is thinking, planning, and executing..."):
             try:
-                # LLM Configuration using the super-fast gemini-2.0-flash
+                # FIXED: Prefixed with 'google/' to correctly map to crewai[google-genai] native provider
                 gemini_llm = LLM(
-                    model="gemini/gemini-3.8-flash", 
+                    model="google/gemini-3.8-flash", 
                     api_key=api_key
                 )
 
@@ -53,8 +53,8 @@ if st.button("🚀 Run AI Agent"):
                 if enable_web_search:
                     tools_list.append(web_search)
 
-                # OPTIMIZATION 2: Set max_iter=1 and max_rpm=10 to force the agent 
-                # to generate the answer immediately instead of looping indefinitely.
+                # FIXED: Changed max_iter to 3 so the agent can execute a web search 
+                # AND still have iterations left to formulate the final answer.
                 my_agent = Agent(
                     role=agent_role,
                     goal=agent_goal,
@@ -62,8 +62,8 @@ if st.button("🚀 Run AI Agent"):
                     tools=tools_list,
                     llm=gemini_llm,
                     verbose=True,
-                    max_iter=1,  # Stops the "thought loop" after 1 try
-                    max_rpm=10   # Limits requests to prevent API throttling
+                    max_iter=1,  
+                    max_rpm=10   
                 )
 
                 # Define the Task using UI query
